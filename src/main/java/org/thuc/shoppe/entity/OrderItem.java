@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "OrderItems")
+@Table(name = "order_items")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,11 +25,11 @@ public class OrderItem extends BaseAudit {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orderId")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId")
+    @JoinColumn(name = "item_id")
     private Item item;
 
     @Column(name = "quantity")

@@ -1,242 +1,291 @@
--- Flyway migration: create initial schema for shoppe application
+-- Flyway migration: create initial schema for shoppe application (snake_case)
 
--- ================= USER =================
-CREATE TABLE IF NOT EXISTS Users (
+-- ================= USERS =================
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    fullName VARCHAR(255),
+    full_name VARCHAR(255),
     phone VARCHAR(20),
-    addressId BIGINT,
+    address_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
--- ================= ROLE =================
-CREATE TABLE IF NOT EXISTS Roles (
+-- ================= ROLES =================
+CREATE TABLE IF NOT EXISTS roles (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
--- ================= PERMISSION =================
-CREATE TABLE IF NOT EXISTS Permissions (
+-- ================= PERMISSIONS =================
+CREATE TABLE IF NOT EXISTS permissions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
--- ================= USER ROLE =================
-CREATE TABLE IF NOT EXISTS UserRoles (
+-- ================= USER ROLES =================
+CREATE TABLE IF NOT EXISTS user_roles (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    userId BIGINT,
-    roleId BIGINT,
+    user_id BIGINT,
+    role_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_userroles_user FOREIGN KEY (userId) REFERENCES Users(id),
-    CONSTRAINT fk_userroles_role FOREIGN KEY (roleId) REFERENCES Roles(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
--- ================= ROLE PERMISSION =================
-CREATE TABLE IF NOT EXISTS RolePermissions (
+-- ================= ROLE PERMISSIONS =================
+CREATE TABLE IF NOT EXISTS role_permissions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    roleId BIGINT,
-    permissionId BIGINT,
+    role_id BIGINT,
+    permission_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_rolepermissions_role FOREIGN KEY (roleId) REFERENCES Roles(id),
-    CONSTRAINT fk_rolepermissions_permission FOREIGN KEY (permissionId) REFERENCES Permissions(id)
+    FOREIGN KEY (role_id) REFERENCES roles(id),
+    FOREIGN KEY (permission_id) REFERENCES permissions(id)
 );
 
--- ================= CART =================
-CREATE TABLE IF NOT EXISTS Carts (
+-- ================= CARTS =================
+CREATE TABLE IF NOT EXISTS carts (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    userId BIGINT UNIQUE,
+    user_id BIGINT UNIQUE,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_carts_user FOREIGN KEY (userId) REFERENCES Users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- ================= CATEGORY =================
-CREATE TABLE IF NOT EXISTS Categories (
+-- ================= CATEGORIES =================
+CREATE TABLE IF NOT EXISTS categories (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
--- ================= PRODUCT =================
-CREATE TABLE IF NOT EXISTS Products (
+-- ================= PRODUCTS =================
+CREATE TABLE IF NOT EXISTS products (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     stock INT DEFAULT 0,
-    categoryId BIGINT,
+    category_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_products_category FOREIGN KEY (categoryId) REFERENCES Categories(id)
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
--- ================= SIZE =================
-CREATE TABLE IF NOT EXISTS Sizes (
+-- ================= SIZES =================
+CREATE TABLE IF NOT EXISTS sizes (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50),
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
--- ================= COLOR =================
-CREATE TABLE IF NOT EXISTS Colors (
+-- ================= COLORS =================
+CREATE TABLE IF NOT EXISTS colors (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50),
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
--- ================= PRODUCT IMAGE =================
-CREATE TABLE IF NOT EXISTS ProductImages (
+-- ================= PRODUCT IMAGES =================
+CREATE TABLE IF NOT EXISTS product_images (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     url TEXT,
-    productId BIGINT,
+    product_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_productimages_product FOREIGN KEY (productId) REFERENCES Products(id)
+    FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- ================= PRODUCT VARIANT =================
-CREATE TABLE IF NOT EXISTS ProductVariants (
+-- ================= PRODUCT VARIANTS =================
+CREATE TABLE IF NOT EXISTS product_variants (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    productId BIGINT,
-    colorId BIGINT,
-    sizeId BIGINT,
+    product_id BIGINT,
+    color_id BIGINT,
+    size_id BIGINT,
     price DECIMAL(10,2),
     stock INT,
-    productImageId BIGINT,
+    product_image_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_productvariants_product FOREIGN KEY (productId) REFERENCES Products(id),
-    CONSTRAINT fk_productvariants_color FOREIGN KEY (colorId) REFERENCES Colors(id),
-    CONSTRAINT fk_productvariants_size FOREIGN KEY (sizeId) REFERENCES Sizes(id),
-    CONSTRAINT fk_productvariants_image FOREIGN KEY (productImageId) REFERENCES ProductImages(id)
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (color_id) REFERENCES colors(id),
+    FOREIGN KEY (size_id) REFERENCES sizes(id),
+    FOREIGN KEY (product_image_id) REFERENCES product_images(id)
 );
 
--- ================= ORDER =================
-CREATE TABLE IF NOT EXISTS Orders (
+-- ================= ORDERS =================
+CREATE TABLE IF NOT EXISTS orders (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    userId BIGINT,
-    totalPrice DECIMAL(12,2),
+    user_id BIGINT,
+    total_price DECIMAL(12,2),
     status VARCHAR(50),
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_orders_user FOREIGN KEY (userId) REFERENCES Users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- ================= ITEM =================
-CREATE TABLE IF NOT EXISTS Items (
+-- ================= ITEMS =================
+CREATE TABLE IF NOT EXISTS items (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    productVariantId BIGINT,
-    orderId BIGINT,
+    product_variant_id BIGINT,
+    order_id BIGINT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_items_variant FOREIGN KEY (productVariantId) REFERENCES ProductVariants(id),
-    CONSTRAINT fk_items_order FOREIGN KEY (orderId) REFERENCES Orders(id)
+    FOREIGN KEY (product_variant_id) REFERENCES product_variants(id),
+    FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
--- ================= ORDER ITEM =================
-CREATE TABLE IF NOT EXISTS OrderItems (
+-- ================= ORDER ITEMS =================
+CREATE TABLE IF NOT EXISTS order_items (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    orderId BIGINT,
-    itemId BIGINT,
-	quantity INT,
+    order_id BIGINT,
+    item_id BIGINT,
+    quantity INT,
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
-    CONSTRAINT fk_orderitems_order FOREIGN KEY (orderId) REFERENCES Orders(id),
-    CONSTRAINT fk_orderitems_item FOREIGN KEY (itemId) REFERENCES Items(id)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
--- ================= PAYMENT =================
-CREATE TABLE IF NOT EXISTS Payments (
+-- ================= PAYMENTS =================
+CREATE TABLE IF NOT EXISTS payments (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    orderId BIGINT,
+    order_id BIGINT,
     amount DECIMAL(12,2),
     method VARCHAR(50),
     status VARCHAR(50),
 
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    isDeleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    is_deleted BOOLEAN DEFAULT FALSE,
 
-    CONSTRAINT fk_payments_order FOREIGN KEY (orderId) REFERENCES Orders(id)
+    FOREIGN KEY (order_id) REFERENCES orders(id)
 );
+
+-- ================= INSERT DATA =================
+INSERT INTO categories (name, created_at, updated_at, created_by, updated_by, is_deleted)
+VALUES
+('Thời trang nam', NOW(), NOW(), 1, 1, FALSE),
+('Thời trang nữ', NOW(), NOW(), 1, 1, FALSE),
+('Điện thoại & Phụ kiện', NOW(), NOW(), 1, 1, FALSE),
+('Máy tính & Laptop', NOW(), NOW(), 1, 1, FALSE),
+('Thiết bị điện tử', NOW(), NOW(), 1, 1, FALSE),
+('Nhà cửa & Đời sống', NOW(), NOW(), 1, 1, FALSE),
+('Sức khỏe & Làm đẹp', NOW(), NOW(), 1, 1, FALSE),
+('Mẹ & Bé', NOW(), NOW(), 1, 1, FALSE),
+('Thể thao & Du lịch', NOW(), NOW(), 1, 1, FALSE),
+('Ô tô & Xe máy & Xe đạp', NOW(), NOW(), 1, 1, FALSE);
+
+INSERT INTO sizes (name, created_at, updated_at, created_by, updated_by, is_deleted)
+VALUES
+('S', NOW(), NOW(), 1, 1, FALSE),
+('M', NOW(), NOW(), 1, 1, FALSE),
+('L', NOW(), NOW(), 1, 1, FALSE),
+('XL', NOW(), NOW(), 1, 1, FALSE);
+
+INSERT INTO colors (name, created_at, updated_at, created_by, updated_by, is_deleted)
+VALUES
+('Đỏ', NOW(), NOW(), 1, 1, FALSE),
+('Xanh', NOW(), NOW(), 1, 1, FALSE),
+('Đen', NOW(), NOW(), 1, 1, FALSE),
+('Trắng', NOW(), NOW(), 1, 1, FALSE);
+
+INSERT INTO products (name, description, stock, category_id, created_at, updated_at, created_by, updated_by, is_deleted)
+VALUES
+('Áo thun nam basic', 'Áo thun cotton 100%', 100, 1, NOW(), NOW(), 1, 1, FALSE),
+('Áo hoodie nữ', 'Hoodie form rộng', 80, 2, NOW(), NOW(), 1, 1, FALSE);
+
+INSERT INTO product_images (url, product_id, created_at, updated_at, created_by, updated_by, is_deleted)
+VALUES
+('https://example.com/aothun.jpg', 1, NOW(), NOW(), 1, 1, FALSE),
+('https://example.com/hoodie.jpg', 2, NOW(), NOW(), 1, 1, FALSE);
+
+INSERT INTO product_variants
+(product_id, color_id, size_id, price, stock, product_image_id, created_at, updated_at, created_by, updated_by
+, is_deleted)
+VALUES
+(1, 1, 1, 120000, 20, 1, NOW(), NOW(), 1, 1, FALSE),
+(1, 2, 2, 125000, 25, 1, NOW(), NOW(), 1, 1, FALSE),
+(1, 3, 3, 130000, 30, 1, NOW(), NOW(), 1, 1, FALSE),
+(2, 1, 2, 250000, 15, 2, NOW(), NOW(), 1, 1, FALSE),
+(2, 4, 3, 260000, 10, 2, NOW(), NOW(), 1, 1, FALSE);

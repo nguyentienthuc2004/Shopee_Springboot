@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ProductImages")
+@Table(name = "product_images")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,6 +28,6 @@ public class ProductImage extends BaseAudit {
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId")
+    @JoinColumn(name = "product_id")
     private Product product;
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "UserRoles")
+@Table(name = "user_roles")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,10 +23,10 @@ public class UserRole extends BaseAudit {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "roleId")
+    @JoinColumn(name = "role_id")
     private Role role;
 }

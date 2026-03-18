@@ -2,6 +2,7 @@ package org.thuc.shoppe.entity;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ProductVariants")
+@Table(name = "product_variants")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,22 +27,24 @@ public class ProductVariant extends BaseAudit {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId")
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "colorId")
+    @JoinColumn(name = "color_id")
     private Color color;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sizeId")
+    @JoinColumn(name = "size_id")
     private Size size;
 
+    @Column(name = "price")
     private BigDecimal price;
 
+    @Column(name = "stock")
     private Integer stock;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productImageId")
+    @JoinColumn(name = "product_image_id")
     private ProductImage productImage;
 }

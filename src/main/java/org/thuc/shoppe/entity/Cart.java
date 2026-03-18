@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Carts")
+@Table(name = "carts")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +23,6 @@ public class Cart extends BaseAudit {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "userId", unique = true)
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 }

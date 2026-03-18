@@ -14,19 +14,19 @@ import lombok.Setter;
 @Setter
 public abstract class BaseAudit {
 
-    @Column(name = "createdAt", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "createdBy")
+    @Column(name = "created_by")
     private Long createdBy;
 
-    @Column(name = "updatedBy")
+    @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Column(name = "isDeleted")
+    @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
     @PrePersist

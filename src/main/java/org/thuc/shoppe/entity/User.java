@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,12 +27,12 @@ public class User extends BaseAudit {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "fullName")
+    @Column(name = "full_name")
     private String fullName;
 
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "addressId")
+    @Column(name = "address_id")
     private Long addressId;
 }

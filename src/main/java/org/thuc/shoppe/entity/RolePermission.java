@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "RolePermissions")
+@Table(name = "role_permissions")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,10 +23,10 @@ public class RolePermission extends BaseAudit {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "roleId")
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "permissionId")
+    @JoinColumn(name = "permission_id")
     private Permission permission;
 }
