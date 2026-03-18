@@ -4,18 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.thuc.shoppe.entity.ProductVariant;
-
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDto {
+public class UserResponseDto {
     private Long id;
-    private String name;
-    private String description;
-    private int stock;
-    private CategoryDto category;
+    private String email;
+    private String fullName;
+    private String phone;
 }

@@ -18,3 +18,6 @@ spring:
 
 server:
   port: 8000
+jwt:
+  secret: ZmFrZV9kZWZhdWx0X3NlY3JldF9mb3Jfc2hvcHBlZmFrZV9kZWZhdWx0X3NlY3JldF9mb3Jfc2hvcHBl
+  expiration: 3600000 # 1 hour in milliseconds
