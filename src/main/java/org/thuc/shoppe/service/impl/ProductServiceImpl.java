@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.thuc.shoppe.constant.ApiMessages;
 import org.thuc.shoppe.entity.Product;
 import org.thuc.shoppe.mapper.ProductMapper;
 import org.thuc.shoppe.model.dto.PageResponseDto;
@@ -29,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto getProductById(Long productId) {
         return productRepository.findById(productId)
                 .map(productMapper::toProductDto)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new RuntimeException(ApiMessages.PRODUCT_NOT_FOUND + productId));
     }
     @Override
     public List<ProductDto> getProductsByCategoryId(Long categoryId) {

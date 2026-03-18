@@ -2,6 +2,7 @@ package org.thuc.shoppe.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.thuc.shoppe.constant.ApiMessages;
 import org.thuc.shoppe.entity.Category;
 import org.thuc.shoppe.exception.NotFoundException;
 import org.thuc.shoppe.mapper.CategoryMapper;
@@ -29,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Category not found with id: " + categoryId));
+                .orElseThrow(() -> new NotFoundException(ApiMessages.CATEGORY_NOT_FOUND + categoryId));
         return categoryMapper.toCategoryDto(category);
     }
 }
