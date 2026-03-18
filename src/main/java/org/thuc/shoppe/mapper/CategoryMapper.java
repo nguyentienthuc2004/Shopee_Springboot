@@ -1,15 +1,11 @@
 package org.thuc.shoppe.mapper;
 
 import lombok.Builder;
+import org.mapstruct.Mapper;
 import org.thuc.shoppe.entity.Category;
 import org.thuc.shoppe.model.dto.CategoryDto;
 
-@Builder
-public class CategoryMapper {
-    public static CategoryDto toCategoryDto(Category category) {
-        return CategoryDto.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
-    }
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
+    public CategoryDto toCategoryDto(Category category);
 }
