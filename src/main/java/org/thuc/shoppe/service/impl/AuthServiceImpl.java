@@ -13,8 +13,8 @@ import org.thuc.shoppe.entity.UserRole;
 import org.thuc.shoppe.exception.NotFoundException;
 import org.thuc.shoppe.exception.ResourceExistsException;
 import org.thuc.shoppe.mapper.UserMapper;
+import org.thuc.shoppe.model.dto.UserDto;
 import org.thuc.shoppe.model.dto.UserLoginResponseDto;
-import org.thuc.shoppe.model.dto.UserResponseDto;
 import org.thuc.shoppe.model.enums.RoleEnum;
 import org.thuc.shoppe.model.request.user.CreateUserRequest;
 import org.thuc.shoppe.model.request.user.UserLoginRequest;
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public UserResponseDto register(CreateUserRequest createUserRequest) {
+    public UserDto register(CreateUserRequest createUserRequest) {
         // Check if user already exists by email
         User existingUser = userRepository.findByEmail(createUserRequest.getEmail());
         if (existingUser != null) {
@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("fullName", user.getFullName());
         claims.put("phone", user.getPhone());
         String accessToken = jwtTokenUtil.generateAccessToken(claims,userLogin.getEmail());
-        UserResponseDto userDto = userMapper.toUserResponseDto(user);
+        UserDto userDto = userMapper.toUserResponseDto(user);
         UserLoginResponseDto response = new UserLoginResponseDto();
         response.setUser(userDto);
         response.setAccessToken(accessToken);

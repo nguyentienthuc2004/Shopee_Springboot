@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CartResponseDto {
     private Long id;
-    private UserResponseDto user;
+    private UserDto user;
 
 }

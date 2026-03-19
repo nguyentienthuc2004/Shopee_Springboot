@@ -9,7 +9,9 @@ import org.thuc.shoppe.entity.CartItem;
 import org.thuc.shoppe.entity.ProductVariant;
 import org.thuc.shoppe.entity.User;
 import org.thuc.shoppe.exception.NotFoundException;
+import org.thuc.shoppe.mapper.CartItemMapper;
 import org.thuc.shoppe.mapper.CartMapper;
+import org.thuc.shoppe.model.dto.CartItemDto;
 import org.thuc.shoppe.model.dto.CartResponseDto;
 import org.thuc.shoppe.model.request.cart.CartItemRequest;
 import org.thuc.shoppe.repo.CartItemRepository;
@@ -19,6 +21,8 @@ import org.thuc.shoppe.security.UserPrincipal;
 import org.thuc.shoppe.service.CartService;
 import org.thuc.shoppe.service.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -27,6 +31,7 @@ public class CartServiceImpl implements CartService {
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;
     private final CartItemRepository cartItemRepository;
+    private final CartItemMapper cartItemMapper;
 
     @Override
     public CartResponseDto createCart() {
@@ -40,10 +45,10 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addItem(CartItemRequest cartItemRequest) {
+    public List<CartItemDto> addItem(CartItemRequest cartItemRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-        int userId = userPrincipal.getId().intValue();
+        Long userId = userPrincipal.getId().longValue();
         Cart cart = cartRepository.findByUserId(userId);
         if(cart==null){
             throw new NotFoundException("Cart not found for user id: " + userId);
@@ -55,12 +60,15 @@ public class CartServiceImpl implements CartService {
         if(existItem!=null){
             existItem.setQuantity(cartItemRequest.getQuantity()+existItem.getQuantity());
             cartItemRepository.save(existItem);
-            return;
+            List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+            return cartItems.stream().map(cartItemMapper::toCartItemDto).toList();
         }
         CartItem item = new CartItem();
         item.setCart(cart);
         item.setProductVariant(productVariant);
         item.setQuantity(cartItemRequest.getQuantity());
         cartItemRepository.save(item);
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+        return cartItems.stream().map(cartItemMapper::toCartItemDto).toList();
     }
 }

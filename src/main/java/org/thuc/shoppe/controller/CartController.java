@@ -5,10 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.thuc.shoppe.model.dto.CartItemDto;
 import org.thuc.shoppe.model.dto.CartResponseDto;
 import org.thuc.shoppe.model.request.cart.CartItemRequest;
 import org.thuc.shoppe.model.response.ResponseSuccessDto;
 import org.thuc.shoppe.service.CartService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,9 +27,9 @@ public class CartController {
         return ResponseEntity.ok(ResponseSuccessDto.success(cart));
     }
     @PostMapping("add")
-    public ResponseEntity<ResponseSuccessDto<String>> addToCart(@RequestBody CartItemRequest cartItemRequest){
+    public ResponseEntity<ResponseSuccessDto<List<CartItemDto>>> addToCart(@RequestBody CartItemRequest cartItemRequest){
         log.debug("Request to add product to cart {}", cartItemRequest);
         cartService.addItem(cartItemRequest);
-        return ResponseEntity.ok(ResponseSuccessDto.success("Product added to cart successfully"));
+        return ResponseEntity.ok(ResponseSuccessDto.success(cartService.addItem(cartItemRequest)));
     }
 }

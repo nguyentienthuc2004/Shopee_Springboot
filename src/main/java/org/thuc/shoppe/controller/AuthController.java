@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.thuc.shoppe.model.dto.UserLoginResponseDto;
-import org.thuc.shoppe.model.dto.UserResponseDto;
+import org.thuc.shoppe.model.dto.UserDto;
 import org.thuc.shoppe.model.request.user.CreateUserRequest;
 import org.thuc.shoppe.model.request.user.UserLoginRequest;
 import org.thuc.shoppe.model.response.ResponseSuccessDto;
@@ -26,9 +26,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseSuccessDto<UserResponseDto>> register(@RequestBody @Valid CreateUserRequest createUserRequest) {
+    public ResponseEntity<ResponseSuccessDto<UserDto>> register(@RequestBody @Valid CreateUserRequest createUserRequest) {
         log.debug("Request to register user with email: {}", createUserRequest.getEmail());
-        UserResponseDto user = authService.register(createUserRequest);
+        UserDto user = authService.register(createUserRequest);
         return new ResponseEntity<>(ResponseSuccessDto.success(user), HttpStatus.CREATED);
     }
     @PostMapping("/login")

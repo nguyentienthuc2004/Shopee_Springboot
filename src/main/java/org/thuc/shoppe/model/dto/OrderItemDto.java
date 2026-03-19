@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginResponseDto {
-    private UserDto user;
-    private String accessToken;
+public class OrderItemDto {
+    private Long id;
+    private Long productVariantId;
+    private int quantity;
 }

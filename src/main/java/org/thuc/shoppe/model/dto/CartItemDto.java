@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartItemResponseDto {
+public class CartItemDto {
     private Long id;
     private int quantity;
     private Long productVariantId;

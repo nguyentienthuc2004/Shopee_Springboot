@@ -29,8 +29,8 @@ public class OrderItem extends BaseAudit {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
-    private Item item;
+    @JoinColumn(name = "product_variant_id")
+    private ProductVariant productVariant;
 
     @Column(name = "quantity")
     private Integer quantity;
