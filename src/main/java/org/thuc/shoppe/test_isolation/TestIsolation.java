@@ -17,7 +17,7 @@ public class ReadUncommitted {
     private final ProductVariantService productVariantService;
     private final ProductVariantRepository productVariantRepository;
     private final ProductVariantMapper productVariantMapper;
-    public ProductVariantDto testReadUncommitted(Long productVariantId, int stock) {
+    public ProductVariantDto testIsolation(Long productVariantId, int stock) {
         Thread A = new Thread(() -> {
             try {
                 productVariantService.updateProductVariantStock(productVariantId, stock);

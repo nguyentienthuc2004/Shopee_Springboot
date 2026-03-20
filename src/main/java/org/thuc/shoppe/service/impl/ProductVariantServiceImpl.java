@@ -21,7 +21,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     private final ProductVariantMapper productVariantMapper;
     @PersistenceContext
     private EntityManager entityManager;
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateProductVariantStock(Long productVariantId, int newStock) throws InterruptedException {
         ProductVariant productVariant = productVariantRepository.findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
@@ -33,7 +33,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         System.out.println("Transaction A: Rollback transaction");
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // Rollback the transaction to simulate uncommitted changes
     }
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void readProductVariantStock(Long productVariantId) {
         ProductVariant productVariant = productVariantRepository.findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
