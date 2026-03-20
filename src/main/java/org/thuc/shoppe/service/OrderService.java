@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface OrderService {
     OrderDto createOrderPermissticLock(List<Long> cartItemIds) throws InterruptedException;
-    public OrderDto createOrder(List<Long> cartItemIds);
+    OrderDto createOrder(List<Long> cartItemIds) throws InterruptedException;
+    OrderDto createOrderOptimisticLock(List<Long> cartItemIds) throws InterruptedException;
 }

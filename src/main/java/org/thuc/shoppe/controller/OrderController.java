@@ -23,7 +23,7 @@ public class OrderController {
     @PostMapping("/create")
     public ResponseEntity<ResponseSuccessDto<OrderDto>> createOrder(@RequestBody OrderRequestDto orderRequest) throws InterruptedException {
         log.debug("Request to create order with cart items: {}", orderRequest);
-        OrderDto order = orderService.createOrderPermissticLock(orderRequest.getCartItemIds());
+        OrderDto order = orderService.createOrderOptimisticLock(orderRequest.getCartItemIds());
         return ResponseEntity.ok(ResponseSuccessDto.success(order));
     }
 }
