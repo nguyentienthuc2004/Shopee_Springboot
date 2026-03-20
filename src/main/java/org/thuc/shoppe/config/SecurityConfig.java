@@ -44,7 +44,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/api/auth/**",
                                 "/api/categories/**",
-                                "/api/products/**"
+                                "/api/products/**",
+                                "/api/isolation/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/cart/**",
