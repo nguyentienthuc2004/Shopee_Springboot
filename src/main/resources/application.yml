@@ -27,6 +27,7 @@ logging:
     org.flywaydb: trace
     org.flywaydb.core: trace
     org.hibernate.SQL: debug
+    root: debug
 
 server:
   port: 8000

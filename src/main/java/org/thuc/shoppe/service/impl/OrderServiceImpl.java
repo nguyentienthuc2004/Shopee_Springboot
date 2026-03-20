@@ -2,6 +2,7 @@ package org.thuc.shoppe.service.impl;
 
 import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Transaction;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +21,10 @@ import org.thuc.shoppe.service.UserRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
@@ -32,23 +35,13 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
+    @Transactional
     @Override
-    public OrderDto createOrder(List<Long> cartItems) {
-
+    public OrderDto createOrder(List<Long> cartItemIds)   {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         User user = userRepository.findByEmail(userPrincipal.getEmail());
         Cart cart = cartRepository.findByUserId(user.getId());
-        // Validate stock for all items first
-        for (Long id : cartItems) {
-            CartItem item = cartItemRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
-            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariant().getId())
-                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariant().getId()));
-            if (item.getQuantity() > productVariant.getStock()) {
-                throw new IllegalArgumentException("Not enough stock for product variant with id: " + productVariant.getId());
-            }
-        }
 
         // Create order entity
         Order order = new Order();
@@ -56,12 +49,68 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalPrice = BigDecimal.ZERO;
-
-        for (Long id : cartItems) {
+        for (Long id : cartItemIds) {
             CartItem item = cartItemRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
             ProductVariant productVariant = productVariantRepository.findById(item.getProductVariant().getId())
                     .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariant().getId()));
+            if (item.getQuantity() > productVariant.getStock()) {
+                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariant().getId());
+            }
+            productVariant.setStock(productVariant.getStock() - item.getQuantity());
+            productVariantRepository.save(productVariant);
+
+            CartItem cartItem = cartItemRepository.findByCartIdAndProductVariantId(cart.getId(), productVariant.getId());
+            if (cartItem != null) {
+                cartItemRepository.delete(cartItem);
+            }
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProductVariant(productVariant);
+            orderItem.setQuantity(item.getQuantity());
+            orderItems.add(orderItem);
+
+            BigDecimal lineTotal = productVariant.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(lineTotal);
+        }
+
+        order.setTotalPrice(totalPrice);
+        order.setUser(user);
+        Order savedOrder = orderRepository.save(order);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setOrder(savedOrder);
+            orderItemRepository.save(orderItem);
+        }// giữ lock
+        return orderMapper.toOrderDto(savedOrder);
+
+    }
+    @Transactional
+    @Override
+    public OrderDto createOrderPermissticLock(List<Long> cartItemIds) throws InterruptedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getEmail());
+        Cart cart = cartRepository.findByUserId(user.getId());
+
+        // Create order entity
+        Order order = new Order();
+        order.setStatus(OrderStatus.PENDING);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
+        List<ProductVariant> productVariants = productVariantRepository.findAllByIdForUpdate(cartItems.stream()
+                .map(item -> item.getProductVariant().getId())
+                .toList());
+        Map<Long, ProductVariant> productVariantMap = productVariants.stream()
+                .collect(java.util.stream.Collectors.toMap(ProductVariant::getId, pv -> pv));
+        log.debug("Thread {} is trying to acquire lock for product variants", Thread.currentThread().getName());
+        Thread.sleep(5000); // giữ lock
+        for (Long id : cartItemIds) {
+            CartItem item = cartItemRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
+            ProductVariant productVariant = productVariantMap.get(item.getProductVariant().getId());
             if (item.getQuantity() > productVariant.getStock()) {
                 throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariant().getId());
             }

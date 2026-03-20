@@ -21,9 +21,9 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     @PostMapping("/create")
-    public ResponseEntity<ResponseSuccessDto<OrderDto>> createOrder(@RequestBody OrderRequestDto orderRequest){
+    public ResponseEntity<ResponseSuccessDto<OrderDto>> createOrder(@RequestBody OrderRequestDto orderRequest) throws InterruptedException {
         log.debug("Request to create order with cart items: {}", orderRequest);
-        OrderDto order = orderService.createOrder(orderRequest.getCartItemIds());
+        OrderDto order = orderService.createOrderPermissticLock(orderRequest.getCartItemIds());
         return ResponseEntity.ok(ResponseSuccessDto.success(order));
     }
 }
