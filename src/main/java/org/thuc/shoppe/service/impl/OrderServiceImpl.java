@@ -1,0 +1,209 @@
+package org.thuc.shoppe.service.impl;
+
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.OptimisticLockException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Transaction;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.thuc.shoppe.entity.*;
+import org.thuc.shoppe.exception.NotFoundException;
+import org.thuc.shoppe.mapper.OrderMapper;
+import org.thuc.shoppe.model.dto.OrderDto;
+import org.thuc.shoppe.model.enums.OrderStatus;
+import org.thuc.shoppe.repo.*;
+import org.thuc.shoppe.security.UserPrincipal;
+import org.thuc.shoppe.service.OrderService;
+import org.thuc.shoppe.service.UserRepository;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+    private final OrderRepository orderRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderMapper orderMapper;
+    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+
+    @Transactional
+    @Override
+    public OrderDto createOrder(List<Long> cartItemIds) throws InterruptedException {
+        log.debug("Thread {} is trying to acquire lock for product variants at {}", Thread.currentThread().getName(), LocalDateTime.now());
+        Thread.sleep(1000); // giữ lock
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getEmail());
+        Cart cart = cartRepository.findByUserId(user.getId());
+
+        // Create order entity
+        Order order = new Order();
+        order.setStatus(OrderStatus.PENDING);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (Long id : cartItemIds) {
+            CartItem item = cartItemRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
+            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariant().getId())
+                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariant().getId()));
+            if (item.getQuantity() > productVariant.getStock()) {
+                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariant().getId());
+            }
+            productVariant.setStock(productVariant.getStock() - item.getQuantity());
+            productVariantRepository.save(productVariant);
+
+            CartItem cartItem = cartItemRepository.findByCartIdAndProductVariantId(cart.getId(), productVariant.getId());
+            if (cartItem != null) {
+                cartItemRepository.delete(cartItem);
+            }
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProductVariant(productVariant);
+            orderItem.setQuantity(item.getQuantity());
+            orderItems.add(orderItem);
+
+            BigDecimal lineTotal = productVariant.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(lineTotal);
+        }
+
+        order.setTotalPrice(totalPrice);
+        order.setUser(user);
+        Order savedOrder = orderRepository.save(order);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setOrder(savedOrder);
+            orderItemRepository.save(orderItem);
+        }
+        return orderMapper.toOrderDto(savedOrder);
+
+    }
+
+
+    @Transactional
+    @Override
+    public OrderDto createOrderPermissticLock(List<Long> cartItemIds) throws InterruptedException {
+        log.debug("Try to acquire pessimistic lock at {}", LocalDateTime.now());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getEmail());
+        Cart cart = cartRepository.findByUserId(user.getId());
+
+        // Create order entity
+        Order order = new Order();
+        order.setStatus(OrderStatus.PENDING);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
+        List<ProductVariant> productVariants = productVariantRepository.findAllByIdForUpdate(cartItems.stream()
+                .map(item -> item.getProductVariant().getId())
+                .toList());
+        Map<Long, ProductVariant> productVariantMap = productVariants.stream()
+                .collect(java.util.stream.Collectors.toMap(ProductVariant::getId, pv -> pv));
+        log.debug("Thread {} is trying to acquire lock for product variants at {}", Thread.currentThread().getName(), LocalDateTime.now());
+        Thread.sleep(5000); // giữ lock
+        for (Long id : cartItemIds) {
+            CartItem item = cartItemRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
+            ProductVariant productVariant = productVariantMap.get(item.getProductVariant().getId());
+            log.debug("Thread {} has acquired lock for product variant with id: {} at {}", Thread.currentThread().getName(), productVariant.getId(), LocalDateTime.now());
+            if (item.getQuantity() > productVariant.getStock()) {
+                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariant().getId());
+            }
+            productVariant.setStock(productVariant.getStock() - item.getQuantity());
+            productVariantRepository.save(productVariant);
+
+            CartItem cartItem = cartItemRepository.findByCartIdAndProductVariantId(cart.getId(), productVariant.getId());
+            if (cartItem != null) {
+                cartItemRepository.delete(cartItem);
+            }
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProductVariant(productVariant);
+            orderItem.setQuantity(item.getQuantity());
+            orderItems.add(orderItem);
+
+            BigDecimal lineTotal = productVariant.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(lineTotal);
+        }
+
+        order.setTotalPrice(totalPrice);
+        order.setUser(user);
+        Order savedOrder = orderRepository.save(order);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setOrder(savedOrder);
+            orderItemRepository.save(orderItem);
+        }
+        return orderMapper.toOrderDto(savedOrder);
+
+    }
+    @Transactional
+    @Override
+    public OrderDto createOrderOptimisticLock(List<Long> cartItemIds) throws InterruptedException {
+        log.debug("Try to create order optimistic lock with cart item ids: {}", cartItemIds);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getEmail());
+        Cart cart = cartRepository.findByUserId(user.getId());
+
+        // Create order entity
+        Order order = new Order();
+        order.setStatus(OrderStatus.PENDING);
+        List<OrderItem> orderItems = new ArrayList<>();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        log.debug("Thread {} is trying to acquire lock for product variants at {}", Thread.currentThread().getName(), LocalDateTime.now());
+        Thread.sleep(5000); // giữ lock
+        for (Long id : cartItemIds) {
+            CartItem item = cartItemRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
+            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariant().getId())
+                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariant().getId()));
+            if (item.getQuantity() > productVariant.getStock()) {
+                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariant().getId());
+            }
+            try{
+                productVariant.setStock(productVariant.getStock() - item.getQuantity());
+                productVariantRepository.save(productVariant);
+            }catch (OptimisticLockException e){
+                throw new OptimisticLockException("Product variant with id: " + item.getProductVariant().getId() + " was modified by another transaction. Please try again.");
+            }
+
+            CartItem cartItem = cartItemRepository.findByCartIdAndProductVariantId(cart.getId(), productVariant.getId());
+            if (cartItem != null) {
+                cartItemRepository.delete(cartItem);
+            }
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProductVariant(productVariant);
+            orderItem.setQuantity(item.getQuantity());
+            orderItems.add(orderItem);
+
+            BigDecimal lineTotal = productVariant.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(lineTotal);
+        }
+
+        order.setTotalPrice(totalPrice);
+        order.setUser(user);
+        Order savedOrder = orderRepository.save(order);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setOrder(savedOrder);
+            orderItemRepository.save(orderItem);
+        }
+        return orderMapper.toOrderDto(savedOrder);
+    }
+
+}

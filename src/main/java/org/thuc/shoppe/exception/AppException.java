@@ -1,18 +1,19 @@
 package org.thuc.shoppe.exception;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class AppException extends RuntimeException {
-    private final int code;
+    private final HttpStatus status;
 
-    public AppException(int code, String message) {
+    public AppException(HttpStatus status, String message) {
         super(message);
-        this.code = code;
+        this.status = status;
     }
 
-    public AppException(int code, String message, Throwable cause) {
+    public AppException(HttpStatus status, String message, Throwable cause) {
         super(message, cause);
-        this.code = code;
+        this.status = status;
     }
 }

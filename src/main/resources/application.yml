@@ -8,13 +8,30 @@ spring:
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true     # log SQL
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
+    open-in-view: false  # tắt cảnh báo open-in-view
+
+logging:
+  level:
+    org.flywaydb: trace
+    org.flywaydb.core: trace
+    org.hibernate.SQL: debug
+    org.thuc.shoppe: debug
 
 server:
   port: 8000
+
+jwt:
+  secret: ZmFrZV9kZWZhdWx0X3NlY3JldF9mb3Jfc2hvcHBlZmFrZV9kZWZhdWx0X3NlY3JldF9mb3Jfc2hvcHBl
+  expiration: 3600000 # 1 hour in milliseconds

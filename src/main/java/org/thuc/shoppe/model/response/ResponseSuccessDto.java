@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.thuc.shoppe.constant.ApiCodes;
-import org.thuc.shoppe.constant.ApiMessages;
+
 
 @Getter
 @Setter
@@ -24,6 +23,6 @@ public class ResponseSuccessDto<T> {
     }
 
     public static <T> ResponseSuccessDto<T> success(T data) {
-        return of(ApiCodes.SUCCESS, ApiMessages.SUCCESS, data);
+        return of(200,"Success", data);
     }
 }
