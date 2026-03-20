@@ -1,15 +1,17 @@
 package org.thuc.shoppe.service.impl;
 
+import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Transaction;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thuc.shoppe.entity.*;
 import org.thuc.shoppe.exception.NotFoundException;
 import org.thuc.shoppe.mapper.OrderMapper;
 import org.thuc.shoppe.model.dto.OrderDto;
 import org.thuc.shoppe.model.enums.OrderStatus;
-import org.thuc.shoppe.model.request.cart.CartItemRequest;
 import org.thuc.shoppe.repo.*;
 import org.thuc.shoppe.security.UserPrincipal;
 import org.thuc.shoppe.service.OrderService;
@@ -31,18 +33,20 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public OrderDto createOrder(List<CartItemRequest> cartItems) {
+    public OrderDto createOrder(List<Long> cartItems) {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         User user = userRepository.findByEmail(userPrincipal.getEmail());
         Cart cart = cartRepository.findByUserId(user.getId());
         // Validate stock for all items first
-        for (CartItemRequest item : cartItems) {
-            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariantId())
-                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariantId()));
-
+        for (Long id : cartItems) {
+            CartItem item = cartItemRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
+            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariant().getId())
+                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariant().getId()));
             if (item.getQuantity() > productVariant.getStock()) {
-                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariantId());
+                throw new IllegalArgumentException("Not enough stock for product variant with id: " + productVariant.getId());
             }
         }
 
@@ -53,13 +57,13 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalPrice = BigDecimal.ZERO;
 
-        for (CartItemRequest item : cartItems) {
-            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariantId())
-                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariantId()));
-
-
+        for (Long id : cartItems) {
+            CartItem item = cartItemRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Cart item not found with id: " + id));
+            ProductVariant productVariant = productVariantRepository.findById(item.getProductVariant().getId())
+                    .orElseThrow(() -> new NotFoundException("Product variant not found with id: " + item.getProductVariant().getId()));
             if (item.getQuantity() > productVariant.getStock()) {
-                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariantId());
+                throw new IllegalArgumentException("Not enough stock for product variant with id: " + item.getProductVariant().getId());
             }
             productVariant.setStock(productVariant.getStock() - item.getQuantity());
             productVariantRepository.save(productVariant);

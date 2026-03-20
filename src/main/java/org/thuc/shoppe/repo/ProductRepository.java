@@ -32,4 +32,6 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             nativeQuery = true
     )
     Page<Product> searchByProductNameOrCategoryName(@Param("keyword") String keyword, Pageable pageable);
+
+    List<Product> findByStockBetween(int stockMin, int stockMax);
 }

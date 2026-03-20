@@ -53,4 +53,10 @@ public class ProductServiceImpl implements ProductService {
                 .totalPages(products.getTotalPages())
                 .build();
     }
+
+    @Override
+    public List<ProductDto> getProductsByStockRange(int stockMin, int stockMax) {
+        List<Product> products = productRepository.findByStockBetween(stockMin, stockMax);
+        return products.stream().map(productMapper::toProductDto).toList();
+    }
 }

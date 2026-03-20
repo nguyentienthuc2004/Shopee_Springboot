@@ -1,6 +1,7 @@
 package org.thuc.shoppe.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -47,5 +48,13 @@ public class ProductController {
         log.debug("Request to search products with keyword: {}, page: {}, pageSize: {}", keyword, pageNo, pageSize);
         PageResponseDto<List<ProductDto>> result = productService.searchProducts(keyword, pageNo, pageSize);
         return ResponseEntity.ok(ResponseSuccessDto.success(result));
+    }
+    @GetMapping("filter-stock")
+    public ResponseEntity<ResponseSuccessDto<List<ProductDto>>> getProductsByStock(
+            @RequestParam int stockMin,
+            @RequestParam int stockMax) {
+        log.debug("Request to filter products by stock range: {} - {}", stockMin, stockMax);
+        List<ProductDto> products = productService.getProductsByStockRange(stockMin, stockMax);
+        return ResponseEntity.ok(ResponseSuccessDto.success(products));
     }
 }

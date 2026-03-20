@@ -13,4 +13,6 @@ public interface ProductService {
     List<ProductDto> getProductsByCategoryId(Long categoryId);
 
     PageResponseDto<List<ProductDto>> searchProducts(String keyword, int pageNo, int pageSize);
+
+    List<ProductDto> getProductsByStockRange(int stockMin, int stockMax);
 }
