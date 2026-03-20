@@ -30,14 +30,25 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         entityManager.flush(); // Ensure changes are sent to the database immediately
         System.out.println("Transaction A: Updated stock to " + newStock);
         Thread.sleep(5000);
-        System.out.println("Transaction A: Rollback transaction");
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // Rollback the transaction to simulate uncommitted changes
+        System.out.println("Transaction A: Commit transaction");
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void readProductVariantStock(Long productVariantId) {
         ProductVariant productVariant = productVariantRepository.findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
         System.out.println("Transaction B: Read stock as " + productVariant.getStock());
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ProductVariantDto fetchProductVariantStock(Long productVariantId) throws InterruptedException {
+        ProductVariant productVariant = productVariantRepository.findById(productVariantId)
+                .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
+        System.out.println("Thread B Fetched stock: " + productVariant.getStock());
+        Thread.sleep(8000);
+        entityManager.refresh(productVariant);
+        ProductVariant refreshedProductVariant = productVariantRepository.findById(productVariantId)
+                .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
+        System.out.println("Thread B Fetched stock after sleep: " + refreshedProductVariant.getStock());
+        return productVariantMapper.toProductVariantDto(productVariant);
     }
     @Transactional(readOnly = true)
     @Override
@@ -50,4 +61,5 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
         return productVariantMapper.toProductVariantDto(productVariant);
     }
+
 }
