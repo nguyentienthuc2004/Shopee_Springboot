@@ -38,7 +38,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
         System.out.println("Transaction B: Read stock as " + productVariant.getStock());
     }
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public ProductVariantDto fetchProductVariantStock(Long productVariantId) throws InterruptedException {
         ProductVariant productVariant = productVariantRepository.findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
