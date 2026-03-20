@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.thuc.shoppe.entity.ProductVariant;
 import org.thuc.shoppe.exception.NotFoundException;
 import org.thuc.shoppe.mapper.ProductMapper;
@@ -17,6 +18,7 @@ import org.thuc.shoppe.service.ProductVariantService;
 @RequiredArgsConstructor
 public class ProductVariantServiceImpl implements ProductVariantService {
     private final ProductVariantRepository productVariantRepository;
+    private final ProductVariantMapper productVariantMapper;
     @PersistenceContext
     private EntityManager entityManager;
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -29,12 +31,23 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         System.out.println("Transaction A: Updated stock to " + newStock);
         Thread.sleep(5000);
         System.out.println("Transaction A: Rollback transaction");
-        throw new RuntimeException("Simulate transaction rollback");
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // Rollback the transaction to simulate uncommitted changes
     }
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public void readProductVariantStock(Long productVariantId) {
         ProductVariant productVariant = productVariantRepository.findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
         System.out.println("Transaction B: Read stock as " + productVariant.getStock());
+    }
+    @Transactional(readOnly = true)
+    @Override
+    public ProductVariantDto updateProductVariantStockWithReadOnlyFalse(Long productVariantId, int newStock) {
+        ProductVariant productVariant = productVariantRepository.findById(productVariantId)
+                .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
+        productVariant.setStock(newStock);
+        entityManager.clear();
+        productVariant = productVariantRepository.findById(productVariantId)
+                .orElseThrow(() -> new NotFoundException("Product variant not found: " + productVariantId));
+        return productVariantMapper.toProductVariantDto(productVariant);
     }
 }
