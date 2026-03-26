@@ -26,12 +26,22 @@ logging:
   level:
     org.flywaydb: trace
     org.flywaydb.core: trace
-    org.hibernate.SQL: debug
     org.thuc.shoppe: debug
-
+resilience4j:
+  circuitbreaker:
+    instances:
+      productService:
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 3s
 server:
   port: 8000
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 jwt:
   secret: ZmFrZV9kZWZhdWx0X3NlY3JldF9mb3Jfc2hvcHBlZmFrZV9kZWZhdWx0X3NlY3JldF9mb3Jfc2hvcHBl
   expiration: 3600000 # 1 hour in milliseconds

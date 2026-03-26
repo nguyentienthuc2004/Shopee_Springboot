@@ -1,8 +1,10 @@
 package org.thuc.shoppe.controller;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Fallback;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.thuc.shoppe.model.dto.PageResponseDto;
@@ -19,11 +21,20 @@ public class ProductController {
     private final Logger log = LoggerFactory.getLogger(ProductController.class);
     private final ProductService productService;
 
+    @CircuitBreaker(name = "productService", fallbackMethod = "getAllProductsFallback")
     @GetMapping
-    public ResponseEntity<ResponseSuccessDto<List<ProductDto>>> getAllProducts(){
+    public ResponseEntity<ResponseSuccessDto<List<ProductDto>>> getAllProducts(@RequestParam int a){
         log.debug("Request to get all products");
         List<ProductDto> products = productService.getAllProducts();
+        if(a==1){
+            throw new RuntimeException("Simulated failure");
+        }
         return ResponseEntity.ok(ResponseSuccessDto.success(products));
+    }
+    @Fallback
+    public ResponseEntity<ResponseSuccessDto<List<ProductDto>>> getAllProductsFallback(Exception e) {
+        log.error("Failed to get all products, fallback triggered: {}", e.getMessage());
+        return ResponseEntity.ok(ResponseSuccessDto.success(List.of()));
     }
     @GetMapping("{productId}")
     public ResponseEntity<ResponseSuccessDto<ProductDto>> getProductById(@PathVariable Long productId){

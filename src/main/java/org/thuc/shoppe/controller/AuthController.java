@@ -28,12 +28,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ResponseSuccessDto<UserDto>> register(@RequestBody @Valid CreateUserRequest createUserRequest) {
         log.debug("Request to register user with email: {}", createUserRequest.getEmail());
+
         UserDto user = authService.register(createUserRequest);
         return new ResponseEntity<>(ResponseSuccessDto.success(user), HttpStatus.CREATED);
     }
     @PostMapping("/login")
     public ResponseEntity<ResponseSuccessDto<UserLoginResponseDto>> login(@RequestBody @Valid UserLoginRequest userLogin){
-        log.debug("Request to login user with email: {}", userLogin.getEmail());
         UserLoginResponseDto response = authService.login(userLogin);
         return ResponseEntity.ok(ResponseSuccessDto.success(response));
     }

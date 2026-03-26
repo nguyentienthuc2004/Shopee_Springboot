@@ -3,6 +3,7 @@ package org.thuc.shoppe.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.thuc.shoppe.entity.Cart;
 import org.thuc.shoppe.entity.CartItem;
@@ -36,8 +37,12 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto createCart() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-        User user = userRepository.findByEmail(userPrincipal.getEmail());
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(userDetails.getUsername());
+        if(user==null){
+            throw new NotFoundException("User not found with email: " + email);
+        }
         Cart newCart = new Cart();
         newCart.setUser(user);
         Cart savedCart = cartRepository.save(newCart);

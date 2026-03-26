@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.thuc.shoppe.annotation.CheckRole;
+import org.thuc.shoppe.annotation.CurrentUserEmail;
 import org.thuc.shoppe.model.dto.CartItemDto;
 import org.thuc.shoppe.model.dto.CartResponseDto;
 import org.thuc.shoppe.model.request.cart.CartItemRequest;
@@ -20,6 +22,7 @@ public class CartController {
     public final Logger log = LoggerFactory.getLogger(CartController.class);
     public final CartService cartService;
 
+    @CheckRole("USER")
     @PostMapping("create")
     public ResponseEntity<ResponseSuccessDto<CartResponseDto>> createCart(){
         log.debug("Request to create cart");

@@ -150,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(savedOrder);
 
     }
+
     @Transactional
     @Override
     public OrderDto createOrderOptimisticLock(List<Long> cartItemIds) throws InterruptedException {
@@ -205,5 +206,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderMapper.toOrderDto(savedOrder);
     }
+
 
 }
