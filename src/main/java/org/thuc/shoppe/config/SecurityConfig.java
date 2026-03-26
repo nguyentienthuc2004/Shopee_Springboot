@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "/api/isolation/**",
                                 "/api/propagation/**",
                                 "/api/product-variants/**",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/api/restaurants/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/cart/**",
