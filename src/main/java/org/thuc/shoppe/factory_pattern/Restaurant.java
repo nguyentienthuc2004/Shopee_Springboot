@@ -1,11 +1,11 @@
 package org.thuc.shoppe.factory_pattern;
 
+import org.springframework.stereotype.Component;
+
 public abstract class Restaurant {
     public abstract Burger createBurger();
     public Burger orderBurger(){
-        Burger burger = createBurger();
-        String preparation = burger.prepare();
-        System.out.println(preparation);
-        return burger;
+        return createBurger();
     }
+
 }
