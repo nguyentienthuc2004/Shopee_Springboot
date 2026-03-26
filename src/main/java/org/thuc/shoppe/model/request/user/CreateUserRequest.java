@@ -4,15 +4,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class CreateUserRequest {
 
     @Email(message = "Email  not valid")
@@ -30,4 +28,14 @@ public class CreateUserRequest {
     @Pattern(regexp = "^(\\+84|0)\\d{9}$",
             message = "Phone number must be valid and start with +84 or 0 followed by 9 digits")
     private String phone;
+
+    @Override
+    public String toString() {
+        return "CreateUserRequest{" +
+                "email='" + email + '\'' +
+                ", password='[PROTECTED]'" +
+                ", fullName='" + fullName + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
+    }
 }

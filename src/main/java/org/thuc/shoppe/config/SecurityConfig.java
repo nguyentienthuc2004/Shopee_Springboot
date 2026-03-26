@@ -45,13 +45,16 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/api/categories/**",
                                 "/api/products/**",
-                                "/api/isolation/**"
+                                "/api/isolation/**",
+                                "/api/propagation/**",
+                                "/api/product-variants/**",
+                                "/actuator/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/cart/**",
                                 "/api/orders/**"
-                        ).hasRole(RoleEnum.ROLE_USER)
-                        .anyRequest().authenticated()
+                        )
+                        .authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

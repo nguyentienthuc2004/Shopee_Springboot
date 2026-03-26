@@ -33,7 +33,9 @@ public class Product extends BaseAudit {
     @Column(name = "stock")
     private Integer stock = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+
 }

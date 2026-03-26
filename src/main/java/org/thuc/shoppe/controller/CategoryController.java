@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.thuc.shoppe.model.dto.CategoryDto;
 import org.thuc.shoppe.model.response.ResponseSuccessDto;
+import org.thuc.shoppe.repo.CategoryRepository;
 import org.thuc.shoppe.service.CategoryService;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
     private final Logger log = LoggerFactory.getLogger(CategoryController.class);
-
+    private final CategoryRepository categoryRepository;
     @GetMapping
     public ResponseEntity<ResponseSuccessDto<List<CategoryDto>>> getAll() {
         log.debug("Request to get all categories");
