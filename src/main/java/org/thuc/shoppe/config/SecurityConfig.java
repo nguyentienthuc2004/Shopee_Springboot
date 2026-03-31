@@ -21,8 +21,10 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    public SecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+//    private final APIKeyFilter apiKeyFilter;
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          JwtAuthenticationFilter jwtAuthenticationFilter
+                          ) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
@@ -49,9 +51,12 @@ public class SecurityConfig {
                                 "/api/propagation/**",
                                 "/api/product-variants/**",
                                 "/actuator/**",
-                                "/api/restaurants/**"
+                                "/api/restaurants/**",
+                                "/api/payments/**",
+                                "/api/save/**"
                         ).permitAll()
                         .requestMatchers(
+                                "/api/products/**",
                                 "/api/cart/**",
                                 "/api/orders/**"
                         )
